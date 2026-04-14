@@ -109,34 +109,6 @@ Edit `config.ini` with your environment-specific values. Sensitive values (like 
 
 ---
 
-## Usage
-
-### Option 1: Using uv (recommended)
-
-Run the script directly:
-
-```bash
-uv run python gdpr_conflicts.py
-```
-
-### Option 2: Using standard Python
-
-Activate your virtual environment (if being used), then run:
-
-```bash
-python gdpr_conflicts.py
-```
-
-**Note**: *Depending on your system, you may need to use `python3` or `py` instead of `python`.*
-
----
-
-## Output
-
-Depending on configuration, results will be logged to file and/or sent in an email in JSON format to the address configured in `config.ini`.
-
----
-
 ### Logging Settings
 
 | Setting | Description | Data Type | Default Value |
@@ -170,6 +142,34 @@ Optional fields:
 | IGNORE_PATTERNS | Advertised patterns to ignore when assessing conflicts | String | *None* |
 | VERIFY_CERT | Whether TLS certificates present by CUCM should be validated | String | true |
 | HTTP_SECURE | Whether HTTPS should be used for communicating with the cluster | String | true |
+
+---
+
+## Usage
+
+### Option 1: Using uv (recommended)
+
+Run the script directly:
+
+```bash
+uv run python gdpr_conflicts.py
+```
+
+### Option 2: Using standard Python
+
+Activate your virtual environment (if being used), then run:
+
+```bash
+python gdpr_conflicts.py
+```
+
+**Note**: *Depending on your system, you may need to use `python3` or `py` instead of `python`.*
+
+---
+
+## Output
+
+Depending on configuration, results will be logged to file and/or sent in an email in JSON format to the address configured in `config.ini`.
 
 ---
 
