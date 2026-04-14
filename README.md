@@ -16,7 +16,7 @@
 
 ## Overview
 
-This project connects to one or more Cisco Unified Communications Manager (CUCM) clusters via the AXL SOAP API and retrieves Global Dial Plan Replication (GDPR) advertised patterns. It then compares these patterns intra-cluster and inter-cluster to identify conflicts/overlapping patterns. Results can be logged to file and/or sent as a notification via email (unauthenticated email currently only supported).
+This project connects to one or more Cisco Unified Communications Manager (CUCM) clusters via the AXL SOAP API and retrieves Global Dial Plan Replication (GDPR) advertised patterns. It then compares these patterns intra-cluster and inter-cluster to identify conflicts/overlapping patterns. Results can be logged to file and/or sent as a notification via email (unauthenticated email currently only supported). This project is designed for both Windows and UNIX-based (Linux/macOS) system.
 
 ---
 
@@ -46,8 +46,8 @@ This project connects to one or more Cisco Unified Communications Manager (CUCM)
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-username>/<your-repo-name>.git
-cd <your-repo-name>
+git clone https://github.com/sneff91/gdpr-conflicts.git
+cd gdpr-conflicts
 ```
 
 Alternatively, you can download the repository as a ZIP file from GitHub and extract it.
