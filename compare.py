@@ -1,21 +1,20 @@
 from itertools import product
 from typing import List, Set, Dict, Tuple, Any
 
-# --------- Domains ----------
+
 DIGITS = set("0123456789")
 DIALABLE_NON_DIGITS = set("*#")
 DIALABLE_ALL = DIGITS | DIALABLE_NON_DIGITS
 
-# --------- Errors ----------
 class PatternSyntaxError(ValueError):
     """Raised when an advertised pattern has invalid syntax."""
 
-# --------- Parser / Expander ----------
+
 def _parse_bracket_token(token: str) -> List[str]:
     """
     Parse bracket expression like [6-9] or [^2-4].
-    - Ranges allowed: digits 0-9; letters A-D (rare but allowed as literals).
-    - Single members allowed: 0-9, A-D, *, #.
+    - Ranges allowed: digits 0-9;.
+    - Single members allowed: 0-9, *, #.
     - Negation applies ONLY to the digits domain 0-9 (e.g., [^2-4] => {0,1,5,6,7,8,9}).
       Any non-digit members in a negated set are ignored for the negation.
     """
@@ -42,13 +41,13 @@ def _parse_bracket_token(token: str) -> List[str]:
                     members.add(str(d))
             else:
                 raise PatternSyntaxError(
-                    f"Unsupported range '{start}-{end}'. Use 0-9 or A-D."
+                    f"Unsupported range '{start}-{end}'. Use 0-9."
                 )
             i += 3
             continue
 
         # Single member
-        if ch.isdigit() or ch in "ABCD*#":
+        if ch.isdigit() or ch in "*#":
             members.add(ch)
             i += 1
         else:
@@ -64,6 +63,7 @@ def _parse_bracket_token(token: str) -> List[str]:
         raise PatternSyntaxError("[] resolved to an empty set")
 
     return sorted(allowed)
+
 
 def _tokenize_core(p: str) -> Tuple[List[List[str]], bool, bool]:
     """
@@ -117,6 +117,7 @@ def _tokenize_core(p: str) -> Tuple[List[List[str]], bool, bool]:
 
     return choices, ends_with_percent, ends_with_bang
 
+
 def expand_advertised_pattern(
     pattern: str,
     *,
@@ -165,12 +166,13 @@ def expand_advertised_pattern(
 
     return base
 
-# --------- Conflict Detection ----------
+
 def split_expanded(expanded: List[str]) -> Tuple[Set[str], List[str]]:
     """Split expanded results into finite set (no '!') and open-ended prefixes (ending with '!')."""
     finite = {s for s in expanded if not s.endswith('!')}
     prefixes = [s[:-1] for s in expanded if s.endswith('!')]  # strip the '!' for simpler checks
     return finite, prefixes
+
 
 def conflicts_between(expanded_a: List[str], expanded_b: List[str]) -> Dict[str, Any]:
     """
@@ -208,14 +210,18 @@ def conflicts_between(expanded_a: List[str], expanded_b: List[str]) -> Dict[str,
         "prefix_prefix": pp_list,
     }
 
+
 def _total_conflict_count(result: Dict[str, Any]) -> int:
-    """Return total number of conflicts across all categories for a pairwise result."""
+    """
+    Return total number of conflicts across all categories for a pairwise result.
+    """
     return (
         len(result.get("finite_finite", [])) +
         len(result.get("finite_vs_prefix", [])) +
         len(result.get("prefix_vs_finite", [])) +
         len(result.get("prefix_prefix", []))
     )
+
 
 def _summarize_pair(
     cluster_a: str, pat_a: str, exp_a: List[str],
@@ -226,7 +232,7 @@ def _summarize_pair(
     Build a compact summary for a pair of patterns.
     Returns None if no conflicts.
 
-    NOTE: This version merges all sample values into a single list 'samples_all'.
+    NOTE: This merges all sample values into a single list 'samples_all'.
     For prefix-prefix samples, renders as 'PA! ↔ PB!'.
     """
     res = conflicts_between(exp_a, exp_b)
@@ -256,7 +262,7 @@ def _summarize_pair(
         "pattern_a": pat_a,
         "cluster_b": cluster_b,
         "pattern_b": pat_b,
-        "samples": samples_all,  # <--- merged samples here
+        "samples": samples_all,
     }
     return summary
 
@@ -303,9 +309,8 @@ def compare(
                     max_samples=max_samples
                 )
                 if sa:
-                    # For within-cluster entries, you might prefer a shorter shape.
-                    # We'll add 'cluster' (single) and drop 'cluster_b' to reduce duplication.
                     sa["cluster"] = cluster
+                    sa.pop("cluster_a", None)
                     sa.pop("cluster_b", None)
                     within.append(sa)
 
