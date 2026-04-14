@@ -1,0 +1,12 @@
+[project]
+name = "gdpr_conflicts"
+version = "0.1.0"
+description = "Script for identifying intra-cluster and inter-cluster GDPR Advertised Pattern conflicts for CUCM"
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "niquests",
+    "truststore",
+    "xmltodict"
+]
