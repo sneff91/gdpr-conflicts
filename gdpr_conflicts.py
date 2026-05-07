@@ -307,6 +307,9 @@ def main() -> None:
         time_stop = time()
         logging.info(f"Advertised pattern conflict processing time: {time_stop - time_start:.3f} seconds")
 
+    intracluster_overlap_exists: bool = True if intracluster_overlap else False
+    intercluster_conflicts_exists: bool = True if intercluster_conflicts else False
+
     # Reformat the JSON output "pretty print" style if the config.ini setting USE_PRETTY_PRINT is set to true
     if use_pretty_print:
         intracluster_overlap: str = dumps(intracluster_overlap, indent=4, ensure_ascii=False, sort_keys=False, separators=(",", ": "))
@@ -314,18 +317,25 @@ def main() -> None:
 
     email_body: str = ""
 
-    # Include informational intra-cluster pattern overlaps in the output if the config.ini setting SEVERITY_LEVEL is set to 'informational'
+    # Include informational intra-cluster pattern overlaps in the output if the config.ini setting SEVERITY_LEVEL is set to 'informational' and pattern overlaps exist
     if severity_level == 'informational':
-        email_body += f"INTRA-CLUSTER PATTERN OVERLAP:\n{intracluster_overlap}\n\n"
-        logging.info(f"INTRA-CLUSTER PATTERN OVERLAP:\n{intracluster_overlap}")
+        if intracluster_overlap_exists:
+            email_body += f"INTRA-CLUSTER PATTERN OVERLAP:\n{intracluster_overlap}\n\n"
+            logging.info(f"INTRA-CLUSTER PATTERN OVERLAP:\n{intracluster_overlap}")
+        else:
+            logging.info("NO INTRA-CLUSTER PATTERN OVERLAP DETECTED")
 
-    # Log results to file if the config.ini setting OUTPUT_DESTINATION is set to 'logging' or 'both'
+    # Log results to file if the config.ini setting OUTPUT_DESTINATION is set to 'logging' or 'both' and inter-cluster conflicts exist
     if output_destination in ['logging', 'both']:
-        logging.warning(f"INTER-CLUSTER CONFLICTS:\n{intercluster_conflicts}")
+        if intercluster_conflicts_exists:
+            logging.warning(f"INTER-CLUSTER CONFLICTS:\n{intercluster_conflicts}")
+        else:
+            logging.info("NO INTER-CLUSTER CONFLICTS DETECTED")
 
-    # Send results in email notification if the config.ini setting OUTPUT_DESTINATION is set to 'email' or 'both'
-    if output_destination in ['email', 'both']:
-        email_body += f"INTER-CLUSTER CONFLICTS:\n{intercluster_conflicts}"
+    # Send results in email notification if the config.ini setting OUTPUT_DESTINATION is set to 'email' or 'both' and there are conflicts
+    if output_destination in ['email', 'both'] and (intracluster_overlap_exists or intercluster_conflicts_exists):
+        if intercluster_conflicts_exists:
+            email_body += f"INTER-CLUSTER CONFLICTS:\n{intercluster_conflicts}"
         send_email_notification(
             smtp_server=global_settings.get('smtp_server'),
             smtp_port=global_settings.get('smtp_port'),
